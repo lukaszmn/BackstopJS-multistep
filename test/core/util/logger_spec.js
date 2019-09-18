@@ -5,14 +5,16 @@ const logger = require('../../../core/util/logging/logger');
 describe('logger', function () {
 
   function test(fn) {
-    let log;
+    let log = '';
     const clog = console.log;
-    console.log = function(s) { log = s; };
+    console.log = function(s) { log += s; };
 
-    fn();
-
-    console.log = clog;
-    return log;
+    try {
+      fn();
+    } finally {
+      console.log = clog;
+      return log;
+    }
   }
 
   it('should behave as console.log when no subject is provided', function () {
@@ -63,6 +65,12 @@ describe('logger', function () {
     const fn2 = () => logger('s').log('third\nfourth');
     const log2 = test(fn2);
     assert.strictEqual(log2, chalk.white('               s ') + '| third\n                   fourth');
+  });
+
+  it('should display text of Error', function () {
+    const fn = () => logger().log(new Error('msg'));
+    const log = test(fn);
+    assert.strictEqual(log, chalk.white('Error: msg'));
   });
 
 });

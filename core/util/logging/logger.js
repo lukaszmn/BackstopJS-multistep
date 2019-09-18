@@ -51,7 +51,7 @@ function message (type, subject, string) {
     console.log(typeToColor.warn('Type ' + type + ' is not defined as logging type'));
   }
 
-  if (typeof string !== 'string') {
+  if (string && string.color) {
     // then it is { string, color }
     string = chalk[string.color](string.string);
   }
