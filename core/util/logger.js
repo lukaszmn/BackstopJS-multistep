@@ -51,6 +51,16 @@ function message (type, subject, string) {
     console.log(typeToColor.warn('Type ' + type + ' is not defined as logging type'));
   }
 
+  if (typeof string !== 'string') {
+    // then it is { string, color }
+    string = chalk[string.color](string.string);
+  }
+
+  if (!subject) {
+    console.log(typeToTitleColor[type](string));
+    return;
+  }
+
   if (subject.length < longestTitle) {
     const appendChar = ' ';
     while (subject.length < longestTitle) {
@@ -58,11 +68,6 @@ function message (type, subject, string) {
     }
   } else {
     longestTitle = subject.length;
-  }
-
-  if (typeof string !== 'string') {
-    // then it is { string, color }
-    string = chalk[string.color](string.string);
   }
 
   console.log(typeToTitleColor[type](subject + ' ') + '| ' + paddedString(longestTitle, typeToColor[type](string)));
