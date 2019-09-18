@@ -1,6 +1,6 @@
 const createBitmaps = require('../util/createBitmaps');
 const fs = require('../util/fs');
-const logger = require('../util/logger')('clean');
+const logger = require('../util/logging/logger')('clean');
 const { shouldRunDocker, runDocker } = require('../util/runDocker');
 
 module.exports = {

@@ -8,7 +8,7 @@ var runChromy = require('./runChromy');
 var runPuppet = require('./runPuppet');
 
 const ensureDirectoryPath = require('./ensureDirectoryPath');
-var logger = require('./logger')('createBitmaps');
+var logger = require('./logging/logger')('createBitmaps');
 
 var CONCURRENCY_DEFAULT = 10;
 const CHROMY_STARTING_PORT_NUMBER = 9222;

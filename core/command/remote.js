@@ -1,4 +1,4 @@
-const logger = require('../util/logger')('remote');
+const logger = require('../util/logging/logger')('remote');
 const path = require('path');
 const { exec } = require('child_process');
 const resolver = require('resolve');

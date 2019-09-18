@@ -3,7 +3,7 @@ var cloneDeep = require('lodash/cloneDeep');
 
 var allSettled = require('../util/allSettled');
 var fs = require('../util/fs');
-var logger = require('../util/logger')('report');
+var logger = require('../util/logging/logger')('report');
 var compare = require('../util/compare/');
 
 function writeReport (config, reporter) {

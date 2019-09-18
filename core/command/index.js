@@ -1,5 +1,5 @@
 var path = require('path');
-var logger = require('../util/logger')('COMMAND');
+var logger = require('../util/logging/logger')('COMMAND');
 
 /*
  * Each file included in this folder (except `index.js`) is a command and must export the following object

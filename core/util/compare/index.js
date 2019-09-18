@@ -4,7 +4,7 @@ var fs = require('fs');
 var cp = require('child_process');
 
 var Reporter = require('./../Reporter');
-var logger = require('./../logger')('compare');
+var logger = require('./../logging/logger')('compare');
 var storeFailedDiffStub = require('./store-failed-diff-stub.js');
 
 var ASYNC_COMPARE_LIMIT = 20;

@@ -1,5 +1,5 @@
 var fs = require('../util/fs');
-var logger = require('../util/logger')('init');
+var logger = require('../util/logging/logger')('init');
 
 /**
  * Copies a boilerplate config file to the current config file location.

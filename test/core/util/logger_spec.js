@@ -1,6 +1,6 @@
 const assert = require('assert');
 const chalk = require('chalk');
-const logger = require('../../../core/util/logger');
+const logger = require('../../../core/util/logging/logger');
 
 describe('logger', function () {
 

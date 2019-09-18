@@ -1,5 +1,5 @@
 var chalk = require('chalk');
-var makeSpaces = require('./makeSpaces');
+var makeSpaces = require('../makeSpaces');
 
 function identity (string) { return string; }
 

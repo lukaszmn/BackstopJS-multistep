@@ -1,5 +1,5 @@
 const open = require('opn');
-const logger = require('../util/logger')('openReport');
+const logger = require('../util/logging/logger')('openReport');
 const path = require('path');
 const http = require('http');
 const BACKSTOP_REPORT_SIGNATURE_RE = /BackstopJS Report/i;
