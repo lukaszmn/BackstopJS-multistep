@@ -1,5 +1,4 @@
 var path = require('path');
-var chalk = require('chalk');
 var cloneDeep = require('lodash/cloneDeep');
 
 var allSettled = require('../util/allSettled');
@@ -173,8 +172,8 @@ module.exports = {
     return compare(config).then(function (report) {
       var failed = report.failed();
       logger.log('Test completed...');
-      logger.log(chalk.green(report.passed() + ' Passed'));
-      logger.log(chalk[(failed ? 'red' : 'green')](+failed + ' Failed'));
+      logger.log(logger.green(report.passed() + ' Passed'));
+      logger.log(logger[(failed ? 'red' : 'green')](+failed + ' Failed'));
 
       return writeReport(config, report).then(function (results) {
         for (var i = 0; i < results.length; i++) {

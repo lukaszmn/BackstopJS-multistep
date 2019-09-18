@@ -9,7 +9,7 @@ module.exports = {
     const remoteReportUrl = `http://127.0.0.1:3000/${config.compareReportURL}?remote`;
     return new Promise(function (resolve, reject) {
       // would prefer to ping a http://127.0.0.1:3000/remote with {backstopRemote:ok} response
-      logger.log('Attempting to ping ', remoteReportUrl);
+      logger.log('Attempting to ping ' + remoteReportUrl);
       http.get(remoteReportUrl, (resp) => {
         let data = '';
         resp.on('data', (chunk) => { data += chunk; });

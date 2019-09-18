@@ -60,6 +60,11 @@ function message (type, subject, string) {
     longestTitle = subject.length;
   }
 
+  if (typeof string !== 'string') {
+    // then it is { string, color }
+    string = chalk[string.color](string.string);
+  }
+
   console.log(typeToTitleColor[type](subject + ' ') + '| ' + paddedString(longestTitle, typeToColor[type](string)));
 }
 
@@ -70,6 +75,9 @@ module.exports = function (subject) {
     log: message.bind(null, 'log', subject),
     info: message.bind(null, 'info', subject),
     debug: message.bind(null, 'debug', subject),
-    success: message.bind(null, 'success', subject)
+    success: message.bind(null, 'success', subject),
+
+    green: function(string) { return { string, color: 'green' }; },
+    red: function(string) { return { string, color: 'red' }; }
   };
 };
