@@ -8,7 +8,6 @@ var runChromy = require('./runChromy');
 var runPuppet = require('./runPuppet');
 
 const ensureDirectoryPath = require('./ensureDirectoryPath');
-var logger = require('./logging/logger')('createBitmaps');
 
 var CONCURRENCY_DEFAULT = 10;
 const CHROMY_STARTING_PORT_NUMBER = 9222;
@@ -28,7 +27,7 @@ function ensureViewportLabel (config) {
   }
 }
 
-function decorateConfigForCapture (config, isReference) {
+function decorateConfigForCapture (config, logger, isReference) {
   var configJSON;
 
   if (typeof config.args.config === 'object') {
@@ -85,7 +84,7 @@ function saveViewportIndexes (viewport, index) {
   viewport.vIndex = index;
 }
 
-function delegateScenarios (config) {
+function delegateScenarios (config, logger) {
   // TODO: start chromy here?  Or later?  maybe later because maybe changing resolutions doesn't work after starting?
   // casper.start();
 
@@ -183,7 +182,9 @@ function flatMapTestPairs (rawTestPairs) {
 }
 
 module.exports = function (config, isReference) {
-  const promise = delegateScenarios(decorateConfigForCapture(config, isReference))
+  var logger = require('./logging/logger')(config, 'createBitmaps');
+
+  const promise = delegateScenarios(decorateConfigForCapture(config, logger, isReference), logger)
     .then(rawTestPairs => {
       const result = {
         compareConfig: {

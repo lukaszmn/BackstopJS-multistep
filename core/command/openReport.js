@@ -1,11 +1,12 @@
 const open = require('opn');
-const logger = require('../util/logging/logger')('openReport');
 const path = require('path');
 const http = require('http');
 const BACKSTOP_REPORT_SIGNATURE_RE = /BackstopJS Report/i;
 
 module.exports = {
   execute: function (config) {
+    const logger = require('../util/logging/logger')(config, 'openReport');
+
     const remoteReportUrl = `http://127.0.0.1:3000/${config.compareReportURL}?remote`;
     return new Promise(function (resolve, reject) {
       // would prefer to ping a http://127.0.0.1:3000/remote with {backstopRemote:ok} response

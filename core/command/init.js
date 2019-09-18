@@ -1,11 +1,12 @@
 var fs = require('../util/fs');
-var logger = require('../util/logging/logger')('init');
 
 /**
  * Copies a boilerplate config file to the current config file location.
  */
 module.exports = {
   execute: function init (config) {
+    var logger = require('../util/logging/logger')(config, 'init');
+
     var promises = [];
     if (config.engine_scripts) {
       logger.log("Copying '" + config.engine_scripts_default + "' to '" + config.engine_scripts + "'");
