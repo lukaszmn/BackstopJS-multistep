@@ -1,8 +1,8 @@
 const assert = require('assert');
 const chalk = require('chalk');
-const logger = require('../../../core/util/logging/logger');
+const logger = require('../../../core/util/logging/loggerConsole');
 
-describe('logger', function () {
+describe('logger console', function () {
 
   function test(fn) {
     let log = '';
