@@ -453,12 +453,12 @@ module.exports = async (page, scenario, vp) => {
 
 // onReady example (puppeteer engine)
 module.exports = async (page, scenario, vp) => {
-  console.log('SCENARIO > ' + scenario.label);
+  scenario._logger.log(`SCENARIO > ${scenario.label} (${vp.label})`, { scenario: scenario, viewport: vp });
   await require('./clickAndHoverHelper')(page, scenario);
 
   // Example: changing behavior based on config values
   if (vp.label === 'phone') {
-    console.log( 'doing stuff for just phone viewport here' );
+    scenario._logger.log( 'doing stuff for just phone viewport here', { scenario: scenario, viewport: vp } );
   }
 
   // add more stuff here...
@@ -510,6 +510,21 @@ If you choose the CI-only reporting or even no reporting (CLI is always on) you 
 ```sh
 $ backstop openReport
 ```
+
+#### Select CLI logger
+
+There are several CLI loggers available, useful mainly for the `test` command:
+* `nil` - nothing gets logged to the console
+* `console` - the default one, it logs to the console as in previous versions
+* `context` - it enhances the `console` messages with details about scenario and viewport.
+
+The logger can be selected by using that configuration option:
+```json
+"logger": "nil"
+```
+
+Note that some messages are printed to CLI directly (e.g. before the configuration file is read) and that tasks other `test` may not obey this setting.
+
 
 #### Test report integration with a build system like Jenkins/Travis
 
