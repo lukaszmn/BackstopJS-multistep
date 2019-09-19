@@ -874,6 +874,9 @@ For many users, adding these lines to your `.gitignore` or `.git/info/exclude` f
 backstop_data/html_report/
 bitmaps_test/
 ```
+
+It's worth considering [Git LFS](https://git-lfs.github.com) for storing images, but check if your git server handles it and read about quotas.
+
 _Of course you can alternatively change your default config to save these files somewhere else out of the source control scope -- thats cool too._
 
 
@@ -948,7 +951,7 @@ If you are using Chrome-Headless engine then you have the option of displaying t
 "debugWindow": true
 ```
 
-For all engines there is also the `debug` setting.  This enables verbose console output.This will also output your source payload to the terminal so you can make sure to check that the server is sending what you expect. 😉
+For all engines there is also the `debug` setting. This enables verbose console output. This will also output your source payload to the terminal so you can make sure to check that the server is sending what you expect. 😉
 
 ```json
 "debug": true
