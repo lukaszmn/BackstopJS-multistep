@@ -24,7 +24,7 @@ module.exports = {
           }
         });
       }).on('error', (err) => {
-        logger.log('Remote not found. Opening ' + config.compareReportURL, 'Error: ' + err.message);
+        logger.log('Remote not found. Opening ' + config.compareReportURL + '\nError: ' + err.message);
         resolve(open(path.resolve(config.compareReportURL), { wait: false }));
       });
     });

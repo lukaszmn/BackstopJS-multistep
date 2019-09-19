@@ -22,7 +22,7 @@ module.exports = {
       });
 
       child.stdout.on('close', (data) => {
-        logger.log('Backstop remote connection closed.', data);
+        logger.log('Backstop remote connection closed. ' + data);
         resolve(data);
       });
     });
