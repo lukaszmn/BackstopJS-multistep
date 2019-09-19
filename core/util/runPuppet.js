@@ -2,7 +2,6 @@ const puppeteer = require('puppeteer');
 
 const fs = require('./fs');
 const path = require('path');
-const chalk = require('chalk');
 const ensureDirectoryPath = require('./ensureDirectoryPath');
 const injectBackstopTools = require('../../capture/backstopTools.js');
 const engineTools = require('./engineTools');
@@ -67,7 +66,7 @@ async function processScenarioView (scenario, variantOrScenarioLabelSafe, scenar
   page.setDefaultNavigationTimeout(engineTools.getEngineOption(config, 'waitTimeout', TEST_TIMEOUT));
 
   if (isReference) {
-    console.log(chalk.blue('CREATING NEW REFERENCE FILE'));
+    config._logger.log(config._logger.blue('CREATING NEW REFERENCE FILE'));
   }
 
   // --- set up console output and ready event ---
@@ -82,7 +81,7 @@ async function processScenarioView (scenario, variantOrScenarioLabelSafe, scenar
   page.on('console', msg => {
     for (let i = 0; i < msg.args().length; ++i) {
       const line = msg.args()[i];
-      console.log(`Browser Console Log ${i}: ${line}`);
+      config._logger.log(`Browser Console Log ${i}: ${line}`);
       if (readyEvent && new RegExp(readyEvent).test(line)) {
         readyResolve();
       }
@@ -93,10 +92,10 @@ async function processScenarioView (scenario, variantOrScenarioLabelSafe, scenar
     let v = navigator.userAgent.match(/Chrom(e|ium)\/([0-9]+)\./);
     return v ? parseInt(v[2], 10) : 0;
   });
-  console.log(`Using Chrome/Chromium version: ${chromeVersion}`);
+  config._logger.log(`Using Chrome/Chromium version: ${chromeVersion}`);
 
   if (chromeVersion < MIN_CHROME_VERSION) {
-    console.warn(`***WARNING! CHROME VERSION ${MIN_CHROME_VERSION} OR GREATER IS REQUIRED. PLEASE UPDATE YOUR CHROME APP!***`);
+    config._logger.warn(`***WARNING! CHROME VERSION ${MIN_CHROME_VERSION} OR GREATER IS REQUIRED. PLEASE UPDATE YOUR CHROME APP!***`);
   }
 
   let result;
@@ -108,7 +107,7 @@ async function processScenarioView (scenario, variantOrScenarioLabelSafe, scenar
       if (fs.existsSync(beforeScriptPath)) {
         await require(beforeScriptPath)(page, scenario, viewport, isReference, browser, config);
       } else {
-        console.warn('WARNING: script not found: ' + beforeScriptPath);
+        config._logger.warn('WARNING: script not found: ' + beforeScriptPath);
       }
     }
 
@@ -167,7 +166,7 @@ async function processScenarioView (scenario, variantOrScenarioLabelSafe, scenar
       if (fs.existsSync(readyScriptPath)) {
         await require(readyScriptPath)(page, scenario, viewport, isReference, browser, config);
       } else {
-        console.warn('WARNING: script not found: ' + readyScriptPath);
+        config._logger.warn('WARNING: script not found: ' + readyScriptPath);
       }
     }
 
@@ -223,8 +222,8 @@ async function processScenarioView (scenario, variantOrScenarioLabelSafe, scenar
 
   let error;
   await puppetCommands().catch(e => {
-    console.log(chalk.red(`Puppeteer encountered an error while running scenario "${scenario.label}"`));
-    console.log(chalk.red(e));
+    config._logger.error(`Puppeteer encountered an error while running scenario "${scenario.label}"`);
+    config._logger.error(e);
     error = e;
   });
 
@@ -324,7 +323,7 @@ async function delegateSelectors (
       }
       job = captureJobs.shift();
       job().catch(function (e) {
-        console.log(e);
+        config._logger.error(e);
         errors.push(e);
       }).then(function () {
         next();
@@ -332,10 +331,10 @@ async function delegateSelectors (
     };
     next();
   }).then(async () => {
-    console.log(chalk.green('x Close Browser'));
+    config._logger.log(config._logger.green('x Close Browser'));
     await browser.close();
   }).catch(async (err) => {
-    console.log(chalk.red(err));
+    config._logger.error(err);
     await browser.close();
   }).then(_ => compareConfig);
 }
@@ -353,7 +352,7 @@ async function captureScreenshot (page, browser, selector, selectorMap, config, 
           fullPage: fullPage
         });
     } catch (e) {
-      console.log(chalk.red(`Error capturing..`), e);
+      config._logger.error(`Error capturing..` + e);
       return fs.copy(config.env.backstop + ERROR_SELECTOR_PATH, filePath);
     }
   } else {
@@ -367,11 +366,11 @@ async function captureScreenshot (page, browser, selector, selectorMap, config, 
           var params = config.puppeteerOffscreenCaptureFix ? { path: path, clip: box } : { path: path };
           await type.screenshot(params);
         } else {
-          console.log(chalk.yellow(`Element not visible for capturing: ${s}`));
+          config._logger.log(config._logger.yellow(`Element not visible for capturing: ${s}`));
           return fs.copy(config.env.backstop + HIDDEN_SELECTOR_PATH, path);
         }
       } else {
-        console.log(chalk.magenta(`Element not found for capturing: ${s}`));
+        config._logger.log(config._logger.magenta(`Element not found for capturing: ${s}`));
         return fs.copy(config.env.backstop + SELECTOR_NOT_FOUND_PATH, path);
       }
     };
@@ -384,7 +383,7 @@ async function captureScreenshot (page, browser, selector, selectorMap, config, 
           try {
             await selectorShot(selector, filePath);
           } catch (e) {
-            console.log(chalk.red(`Error capturing Element ${selector}`), e);
+            config._logger.error(`Error capturing Element ${selector}` + e);
             return fs.copy(config.env.backstop + ERROR_SELECTOR_PATH, filePath);
           }
         })
@@ -399,7 +398,7 @@ function translateUrl (url) {
   const RE = new RegExp('^[./]');
   if (RE.test(url)) {
     const fileUrl = 'file://' + path.join(process.cwd(), url);
-    console.log('Relative filename detected -- translating to ' + fileUrl);
+    config._logger.log('Relative filename detected -- translating to ' + fileUrl);
     return fileUrl;
   } else {
     return url;

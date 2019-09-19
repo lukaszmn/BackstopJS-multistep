@@ -80,7 +80,7 @@ function processScenarioView (scenario, variantOrScenarioLabelSafe, scenarioLabe
   } else {
     // Check for (legacy) chromeFlags setting if there is no engineOptions config. chromeFlags option is depricated.
     if (chromeFlags.length) {
-      console.warn('***The chromeFlags property is depricated -- please see documentation for recommended way of setting chromeFlags.***');
+      config._logger.warn('***The chromeFlags property is depricated -- please see documentation for recommended way of setting chromeFlags.***');
       engineOptions.chromeFlags = chromeFlags;
     }
   }
@@ -99,7 +99,7 @@ function processScenarioView (scenario, variantOrScenarioLabelSafe, scenarioLabe
     // chromyOptions.chromeFlags = chromyOptions.chromeFlags.concat(`--window-size=${VP_W},${VP_H}`);
   }
 
-  console.log('Starting Chromy:', JSON.stringify(chromyOptions));
+  config._logger.log('Starting Chromy: ' + JSON.stringify(chromyOptions));
   let chromy = new Chromy(chromyOptions).chain();
 
   /**
@@ -109,12 +109,12 @@ function processScenarioView (scenario, variantOrScenarioLabelSafe, scenarioLabe
    */
 
   if (isReference) {
-    console.log('CREATING NEW REFERENCE FILES');
+    config._logger.log('CREATING NEW REFERENCE FILES');
   }
 
   // // verbose console errors
   // if (config.debug) {
-  //   console.log('Debug is enabled!');
+  //   config._logger.log('Debug is enabled!');
   //   casper.on('page.error', function (msg, trace) {
   //     this.echo('Remote Error >    ' + msg, 'error');
   //     this.echo('file:     ' + trace[0].file, 'WARNING');
@@ -139,8 +139,10 @@ function processScenarioView (scenario, variantOrScenarioLabelSafe, scenarioLabe
 
   // --- set up console output ---
   chromy.console(function (text, consoleObj) {
-    if (console[consoleObj.level]) {
-      console[consoleObj.level](PORT + ' ' + (consoleObj.level).toUpperCase() + ' > ', text);
+    if (config._logger[consoleObj.level]) {
+      config._logger[consoleObj.level](PORT + ' ' + (consoleObj.level).toUpperCase() + ' > ' + text);
+    } else {
+      config._logger.log(PORT + ' ' + (consoleObj.level).toUpperCase() + ' > ' + text);
     }
   });
 
@@ -150,9 +152,9 @@ function processScenarioView (scenario, variantOrScenarioLabelSafe, scenarioLabe
       return v ? parseInt(v[2], 10) : 0;
     })
     .result(chromeVersion => {
-      console.info(`${PORT} Chrome v${chromeVersion} detected.`);
+      config._logger.info(`${PORT} Chrome v${chromeVersion} detected.`);
       if (chromeVersion < MIN_CHROME_VERSION) {
-        console.warn(`${PORT} ***WARNING! CHROME VERSION ${MIN_CHROME_VERSION} OR GREATER IS REQUIRED. PLEASE UPDATE YOUR CHROME APP!***`);
+        config._logger.warn(`${PORT} ***WARNING! CHROME VERSION ${MIN_CHROME_VERSION} OR GREATER IS REQUIRED. PLEASE UPDATE YOUR CHROME APP!***`);
       }
     });
 
@@ -176,13 +178,13 @@ function processScenarioView (scenario, variantOrScenarioLabelSafe, scenarioLabe
     if (fs.existsSync(beforeScriptPath)) {
       require(beforeScriptPath)(chromy, scenario, viewport, isReference, Chromy, config);
     } else {
-      console.warn(PORT, ' WARNING: script not found: ' + beforeScriptPath);
+      config._logger.warn(PORT + ' WARNING: script not found: ' + beforeScriptPath);
     }
   }
 
   // // --- SIMPLE AUTH ---
   // if (casper.cli.options.user && casper.cli.options.password) {
-  //   console.log('Auth User via CLI: ' + casper.cli.options.user);
+  //   config._logger.log('Auth User via CLI: ' + casper.cli.options.user);
   //   casper.setHttpAuth(casper.cli.options.user, casper.cli.options.password);
   // }
 
@@ -216,9 +218,9 @@ function processScenarioView (scenario, variantOrScenarioLabelSafe, scenarioLabe
   if (config.debug) {
     chromy
       .evaluate(_ => document.head.outerHTML)
-      .result(headStr => console.log(PORT + 'HEAD > ', headStr))
+      .result(headStr => config._logger.debug(PORT + 'HEAD > \n' + headStr))
       .evaluate(_ => document.body.outerHTML)
-      .result(htmlStr => console.log(PORT + 'BODY > ', htmlStr));
+      .result(htmlStr => config._logger.debug(PORT + 'BODY > \n' + htmlStr));
   }
 
   // --- REMOVE SELECTORS ---
@@ -251,7 +253,7 @@ function processScenarioView (scenario, variantOrScenarioLabelSafe, scenarioLabe
     if (fs.existsSync(readyScriptPath)) {
       require(readyScriptPath)(chromy, scenario, viewport, isReference, Chromy, config);
     } else {
-      console.warn(PORT, 'WARNING: script not found: ' + readyScriptPath);
+      config._logger.warn(PORT + ' WARNING: script not found: ' + readyScriptPath);
     }
   }
 
@@ -489,7 +491,7 @@ function captureScreenshot (chromy, filePath_, selector, selectorMap, config, se
         return fs.copy(config.env.backstop + HIDDEN_SELECTOR_PATH, filePath);
       } else {
         if (err) {
-          console.log('ChromyJS returned an unexpected error while attempting to capture a selector.', err);
+          config._logger.error('ChromyJS returned an unexpected error while attempting to capture a selector.' + err);
           return new Error(err);
         }
         ensureDirectoryPath(filePath);
