@@ -54,7 +54,7 @@ function decorateConfigForCapture (config, logger, isReference) {
   config.screenshotDateTime = screenshotDateTime;
 
   if (configJSON.dynamicTestId) {
-    console.log(`dynamicTestId '${configJSON.dynamicTestId}' found. BackstopJS will run in dynamic-test mode.`);
+    logger.log(`dynamicTestId '${configJSON.dynamicTestId}' found. BackstopJS will run in dynamic-test mode.`);
   }
 
   configJSON.env = cloneDeep(config);
@@ -63,6 +63,7 @@ function decorateConfigForCapture (config, logger, isReference) {
   configJSON.defaultMisMatchThreshold = config.defaultMisMatchThreshold;
   configJSON.backstopConfigFileName = config.backstopConfigFileName;
   configJSON.defaultRequireSameDimensions = config.defaultRequireSameDimensions;
+  configJSON._logger = config._logger;
 
   if (config.args.filter) {
     var scenarios = [];
@@ -99,6 +100,7 @@ function delegateScenarios (config, logger) {
     scenario.sIndex = i;
     scenario.selectors = scenario.selectors || [];
     scenario.viewports && scenario.viewports.forEach(saveViewportIndexes);
+    scenario._logger = config._logger;
     scenarios.push(scenario);
 
     if (!config.isReference && scenario.hasOwnProperty('variants')) {
@@ -134,7 +136,7 @@ function delegateScenarios (config, logger) {
     const PORT = (config.startingPort || CHROMY_STARTING_PORT_NUMBER);
     var getFreePorts = require('./getFreePorts');
     return getFreePorts(PORT, scenarioViews.length).then(freeports => {
-      console.log('These ports will be used:', JSON.stringify(freeports));
+      logger.log('These ports will be used:' + JSON.stringify(freeports));
       scenarioViews.forEach((scenarioView, i) => {
         scenarioView.assignedPort = freeports[i];
       });

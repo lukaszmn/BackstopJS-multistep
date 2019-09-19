@@ -57,6 +57,7 @@ var commands = commandNames
         config.perf[command.name] = { started: new Date() };
         logger.info('Executing core for "' + command.name + '"');
 
+        config._logger = require('../util/logging/logger')(config, null);
         var promise = command.commandDefinition.execute(config);
 
         // If the command didn't return a promise, assume it resolved already
