@@ -21,7 +21,10 @@ module.exports = function (config, subject) {
     debug: logger.debug,
     success: logger.success,
 
-    green: logger.green,
-    red: logger.red
+    green: function(string) { return { string, color: 'green' }; },
+    red: function(string) { return { string, color: 'red' }; },
+    blue: function(string) { return { string, color: 'blue' }; },
+    yellow: function(string) { return { string, color: 'yellow' }; },
+    magenta: function(string) { return { string, color: 'magenta' }; }
   };
 };

@@ -80,9 +80,6 @@ module.exports = function (subject) {
     log: message.bind(null, 'log', subject),
     info: message.bind(null, 'info', subject),
     debug: message.bind(null, 'debug', subject),
-    success: message.bind(null, 'success', subject),
-
-    green: function(string) { return { string, color: 'green' }; },
-    red: function(string) { return { string, color: 'red' }; }
+    success: message.bind(null, 'success', subject)
   };
 };
