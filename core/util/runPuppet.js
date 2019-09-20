@@ -35,6 +35,14 @@ module.exports = function (args) {
   return processScenarioView(scenario, variantOrScenarioLabelSafe, scenarioLabelSafe, viewport, config);
 };
 
+function getLoggerDebug(scenario, viewport) {
+  return {
+    scenario: scenario,
+    viewport: viewport,
+    stage: 'browser'
+  };
+}
+
 async function processScenarioView (scenario, variantOrScenarioLabelSafe, scenarioLabelSafe, viewport, config) {
   if (!config.paths) {
     config.paths = {};
@@ -65,8 +73,10 @@ async function processScenarioView (scenario, variantOrScenarioLabelSafe, scenar
   page.setViewport({ width: VP_W, height: VP_H });
   page.setDefaultNavigationTimeout(engineTools.getEngineOption(config, 'waitTimeout', TEST_TIMEOUT));
 
+  const loggerDebug = getLoggerDebug(scenario, viewport);
+
   if (isReference) {
-    config._logger.log(config._logger.blue('CREATING NEW REFERENCE FILE'));
+    config._logger.log(config._logger.blue('CREATING NEW REFERENCE FILE'), loggerDebug);
   }
 
   // --- set up console output and ready event ---
@@ -81,7 +91,7 @@ async function processScenarioView (scenario, variantOrScenarioLabelSafe, scenar
   page.on('console', msg => {
     for (let i = 0; i < msg.args().length; ++i) {
       const line = msg.args()[i];
-      config._logger.log(`Browser Console Log ${i}: ${line}`);
+      config._logger.log(`Browser Console Log ${i}: ${line}`, loggerDebug);
       if (readyEvent && new RegExp(readyEvent).test(line)) {
         readyResolve();
       }
@@ -92,10 +102,10 @@ async function processScenarioView (scenario, variantOrScenarioLabelSafe, scenar
     let v = navigator.userAgent.match(/Chrom(e|ium)\/([0-9]+)\./);
     return v ? parseInt(v[2], 10) : 0;
   });
-  config._logger.log(`Using Chrome/Chromium version: ${chromeVersion}`);
+  config._logger.log(`Using Chrome/Chromium version: ${chromeVersion}`, loggerDebug);
 
   if (chromeVersion < MIN_CHROME_VERSION) {
-    config._logger.warn(`***WARNING! CHROME VERSION ${MIN_CHROME_VERSION} OR GREATER IS REQUIRED. PLEASE UPDATE YOUR CHROME APP!***`);
+    config._logger.warn(`***WARNING! CHROME VERSION ${MIN_CHROME_VERSION} OR GREATER IS REQUIRED. PLEASE UPDATE YOUR CHROME APP!***`, loggerDebug);
   }
 
   let result;
@@ -107,7 +117,7 @@ async function processScenarioView (scenario, variantOrScenarioLabelSafe, scenar
       if (fs.existsSync(beforeScriptPath)) {
         await require(beforeScriptPath)(page, scenario, viewport, isReference, browser, config);
       } else {
-        config._logger.warn('WARNING: script not found: ' + beforeScriptPath);
+        config._logger.warn('WARNING: script not found: ' + beforeScriptPath, loggerDebug);
       }
     }
 
@@ -116,7 +126,7 @@ async function processScenarioView (scenario, variantOrScenarioLabelSafe, scenar
     if (isReference && scenario.referenceUrl) {
       url = scenario.referenceUrl;
     }
-    await page.goto(translateUrl(url));
+    await page.goto(translateUrl(url, function(msg) { config._logger.log(msg, loggerDebug); }));
 
     await injectBackstopTools(page);
 
@@ -166,7 +176,7 @@ async function processScenarioView (scenario, variantOrScenarioLabelSafe, scenar
       if (fs.existsSync(readyScriptPath)) {
         await require(readyScriptPath)(page, scenario, viewport, isReference, browser, config);
       } else {
-        config._logger.warn('WARNING: script not found: ' + readyScriptPath);
+        config._logger.warn('WARNING: script not found: ' + readyScriptPath, loggerDebug);
       }
     }
 
@@ -222,8 +232,8 @@ async function processScenarioView (scenario, variantOrScenarioLabelSafe, scenar
 
   let error;
   await puppetCommands().catch(e => {
-    config._logger.error(`Puppeteer encountered an error while running scenario "${scenario.label}"`);
-    config._logger.error(e);
+    config._logger.error(`Puppeteer encountered an error while running scenario "${scenario.label}"`, loggerDebug);
+    config._logger.error(e, loggerDebug);
     error = e;
   });
 
@@ -298,15 +308,17 @@ async function delegateSelectors (
     }
   });
 
+  const loggerDebug = getLoggerDebug(scenario, viewport);
+
   if (captureDocument) {
-    captureJobs.push(function () { return captureScreenshot(page, browser, captureDocument, selectorMap, config, []); });
+    captureJobs.push(function () { return captureScreenshot(page, browser, captureDocument, selectorMap, config, [], loggerDebug); });
   }
   // TODO: push captureViewport into captureList (instead of calling captureScreenshot()) to improve perf.
   if (captureViewport) {
-    captureJobs.push(function () { return captureScreenshot(page, browser, captureViewport, selectorMap, config, []); });
+    captureJobs.push(function () { return captureScreenshot(page, browser, captureViewport, selectorMap, config, [], loggerDebug); });
   }
   if (captureList.length) {
-    captureJobs.push(function () { return captureScreenshot(page, browser, null, selectorMap, config, captureList); });
+    captureJobs.push(function () { return captureScreenshot(page, browser, null, selectorMap, config, captureList, loggerDebug); });
   }
 
   return new Promise(function (resolve, reject) {
@@ -323,7 +335,7 @@ async function delegateSelectors (
       }
       job = captureJobs.shift();
       job().catch(function (e) {
-        config._logger.error(e);
+        config._logger.error(e, loggerDebug);
         errors.push(e);
       }).then(function () {
         next();
@@ -331,15 +343,15 @@ async function delegateSelectors (
     };
     next();
   }).then(async () => {
-    config._logger.log(config._logger.green('x Close Browser'));
+    config._logger.log(config._logger.green('x Close Browser'), loggerDebug);
     await browser.close();
   }).catch(async (err) => {
-    config._logger.error(err);
+    config._logger.error(err, loggerDebug);
     await browser.close();
   }).then(_ => compareConfig);
 }
 
-async function captureScreenshot (page, browser, selector, selectorMap, config, selectors) {
+async function captureScreenshot (page, browser, selector, selectorMap, config, selectors, loggerDebug) {
   let filePath;
   let fullPage = (selector === NOCLIP_SELECTOR || selector === DOCUMENT_SELECTOR);
   if (selector) {
@@ -352,7 +364,7 @@ async function captureScreenshot (page, browser, selector, selectorMap, config, 
           fullPage: fullPage
         });
     } catch (e) {
-      config._logger.error(`Error capturing..` + e);
+      config._logger.error(`Error capturing..` + e, loggerDebug);
       return fs.copy(config.env.backstop + ERROR_SELECTOR_PATH, filePath);
     }
   } else {
@@ -366,11 +378,11 @@ async function captureScreenshot (page, browser, selector, selectorMap, config, 
           var params = config.puppeteerOffscreenCaptureFix ? { path: path, clip: box } : { path: path };
           await type.screenshot(params);
         } else {
-          config._logger.log(config._logger.yellow(`Element not visible for capturing: ${s}`));
+          config._logger.log(config._logger.yellow(`Element not visible for capturing: ${s}`), loggerDebug);
           return fs.copy(config.env.backstop + HIDDEN_SELECTOR_PATH, path);
         }
       } else {
-        config._logger.log(config._logger.magenta(`Element not found for capturing: ${s}`));
+        config._logger.log(config._logger.magenta(`Element not found for capturing: ${s}`), loggerDebug);
         return fs.copy(config.env.backstop + SELECTOR_NOT_FOUND_PATH, path);
       }
     };
@@ -383,7 +395,7 @@ async function captureScreenshot (page, browser, selector, selectorMap, config, 
           try {
             await selectorShot(selector, filePath);
           } catch (e) {
-            config._logger.error(`Error capturing Element ${selector}` + e);
+            config._logger.error(`Error capturing Element ${selector}` + e, loggerDebug);
             return fs.copy(config.env.backstop + ERROR_SELECTOR_PATH, filePath);
           }
         })
@@ -394,11 +406,11 @@ async function captureScreenshot (page, browser, selector, selectorMap, config, 
 }
 
 // handle relative file name
-function translateUrl (url) {
+function translateUrl (url, log) {
   const RE = new RegExp('^[./]');
   if (RE.test(url)) {
     const fileUrl = 'file://' + path.join(process.cwd(), url);
-    config._logger.log('Relative filename detected -- translating to ' + fileUrl);
+    log('Relative filename detected -- translating to ' + fileUrl);
     return fileUrl;
   } else {
     return url;

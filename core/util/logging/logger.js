@@ -7,6 +7,10 @@ module.exports = function (config, subject) {
       logger = require('./loggerConsole')(subject);
       break;
 
+    case 'context':
+      logger = require('./loggerContext')(subject);
+      break;
+
     case 'nil':
       logger = require('./loggerNil')(subject);
       break;
