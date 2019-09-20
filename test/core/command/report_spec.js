@@ -23,12 +23,12 @@ describe('core report', function () {
     const reporterClass = { failed: () => undefined, passed: () => 'passed', getReport: () => { return { test: 123 }; } };
     const compareMock = sinon.stub().returns(Promise.resolve(reporterClass));
     const loggerMock = () => {
-      return { log: sinon.stub(), error: sinon.stub() };
+      return { log: sinon.stub(), error: sinon.stub(), green: sinon.stub() };
     };
     const writeFileStub = sinon.stub().returns(Promise.resolve());
     const fsMock = { ensureDir: () => Promise.resolve(), writeFile: writeFileStub, copy: () => Promise.resolve() };
     mockery.registerMock('../util/compare/', compareMock);
-    mockery.registerMock('../util/logger', loggerMock);
+    mockery.registerMock('../util/logging/logger', loggerMock);
     mockery.registerMock('../util/fs', fsMock);
 
     var report = require('../../../core/command/report');

@@ -8,7 +8,6 @@ var runChromy = require('./runChromy');
 var runPuppet = require('./runPuppet');
 
 const ensureDirectoryPath = require('./ensureDirectoryPath');
-var logger = require('./logger')('createBitmaps');
 
 var CONCURRENCY_DEFAULT = 10;
 const CHROMY_STARTING_PORT_NUMBER = 9222;
@@ -28,7 +27,7 @@ function ensureViewportLabel (config) {
   }
 }
 
-function decorateConfigForCapture (config, isReference) {
+function decorateConfigForCapture (config, logger, isReference) {
   var configJSON;
 
   if (typeof config.args.config === 'object') {
@@ -55,7 +54,7 @@ function decorateConfigForCapture (config, isReference) {
   config.screenshotDateTime = screenshotDateTime;
 
   if (configJSON.dynamicTestId) {
-    console.log(`dynamicTestId '${configJSON.dynamicTestId}' found. BackstopJS will run in dynamic-test mode.`);
+    logger.log(`dynamicTestId '${configJSON.dynamicTestId}' found. BackstopJS will run in dynamic-test mode.`);
   }
 
   configJSON.env = cloneDeep(config);
@@ -64,6 +63,7 @@ function decorateConfigForCapture (config, isReference) {
   configJSON.defaultMisMatchThreshold = config.defaultMisMatchThreshold;
   configJSON.backstopConfigFileName = config.backstopConfigFileName;
   configJSON.defaultRequireSameDimensions = config.defaultRequireSameDimensions;
+  configJSON._logger = config._logger;
 
   if (config.args.filter) {
     var scenarios = [];
@@ -85,7 +85,7 @@ function saveViewportIndexes (viewport, index) {
   viewport.vIndex = index;
 }
 
-function delegateScenarios (config) {
+function delegateScenarios (config, logger) {
   // TODO: start chromy here?  Or later?  maybe later because maybe changing resolutions doesn't work after starting?
   // casper.start();
 
@@ -100,6 +100,7 @@ function delegateScenarios (config) {
     scenario.sIndex = i;
     scenario.selectors = scenario.selectors || [];
     scenario.viewports && scenario.viewports.forEach(saveViewportIndexes);
+    scenario._logger = config._logger;
     scenarios.push(scenario);
 
     if (!config.isReference && scenario.hasOwnProperty('variants')) {
@@ -135,7 +136,7 @@ function delegateScenarios (config) {
     const PORT = (config.startingPort || CHROMY_STARTING_PORT_NUMBER);
     var getFreePorts = require('./getFreePorts');
     return getFreePorts(PORT, scenarioViews.length).then(freeports => {
-      console.log('These ports will be used:', JSON.stringify(freeports));
+      logger.log('These ports will be used:' + JSON.stringify(freeports));
       scenarioViews.forEach((scenarioView, i) => {
         scenarioView.assignedPort = freeports[i];
       });
@@ -183,7 +184,9 @@ function flatMapTestPairs (rawTestPairs) {
 }
 
 module.exports = function (config, isReference) {
-  const promise = delegateScenarios(decorateConfigForCapture(config, isReference))
+  var logger = require('./logging/logger')(config, 'createBitmaps');
+
+  const promise = delegateScenarios(decorateConfigForCapture(config, logger, isReference), logger)
     .then(rawTestPairs => {
       const result = {
         compareConfig: {

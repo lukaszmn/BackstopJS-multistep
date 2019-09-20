@@ -1,6 +1,5 @@
 const createBitmaps = require('../util/createBitmaps');
 const fs = require('../util/fs');
-const logger = require('../util/logger')('clean');
 const { shouldRunDocker, runDocker } = require('../util/runDocker');
 
 module.exports = {
@@ -8,6 +7,8 @@ module.exports = {
     if (shouldRunDocker(config)) {
       return runDocker(config, 'reference');
     } else {
+      const logger = require('../util/logging/logger')(config, 'clean');
+
       var firstStep;
       // do not remove reference directory if we are in incremental mode
       if (config.args.filter || config.args.i) {

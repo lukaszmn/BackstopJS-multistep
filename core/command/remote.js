@@ -1,4 +1,3 @@
-const logger = require('../util/logger')('remote');
 const path = require('path');
 const { exec } = require('child_process');
 const resolver = require('resolve');
@@ -6,6 +5,8 @@ const ssws = resolver.sync('super-simple-web-server', { basedir: __dirname });
 
 module.exports = {
   execute: function (config) {
+    const logger = require('../util/logging/logger')(config, 'remote');
+
     logger.log('Starting remote.');
 
     const MIDDLEWARE_PATH = path.resolve(config.backstop, 'remote');
@@ -21,7 +22,7 @@ module.exports = {
       });
 
       child.stdout.on('close', (data) => {
-        logger.log('Backstop remote connection closed.', data);
+        logger.log('Backstop remote connection closed. ' + data);
         resolve(data);
       });
     });

@@ -1,5 +1,5 @@
 var chalk = require('chalk');
-var makeSpaces = require('./makeSpaces');
+var makeSpaces = require('../makeSpaces');
 
 function identity (string) { return string; }
 
@@ -49,6 +49,16 @@ function message (type, subject, string) {
   if (!typeToColor.hasOwnProperty(type)) {
     type = 'info';
     console.log(typeToColor.warn('Type ' + type + ' is not defined as logging type'));
+  }
+
+  if (string && string.color) {
+    // then it is { string, color }
+    string = chalk[string.color](string.string);
+  }
+
+  if (!subject) {
+    console.log(typeToTitleColor[type](string));
+    return;
   }
 
   if (subject.length < longestTitle) {

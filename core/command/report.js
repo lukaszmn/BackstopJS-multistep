@@ -1,29 +1,27 @@
 var path = require('path');
-var chalk = require('chalk');
 var cloneDeep = require('lodash/cloneDeep');
 
 var allSettled = require('../util/allSettled');
 var fs = require('../util/fs');
-var logger = require('../util/logger')('report');
 var compare = require('../util/compare/');
 
-function writeReport (config, reporter) {
+function writeReport (config, logger, reporter) {
   var promises = [];
 
   if (config.report && config.report.indexOf('CI') > -1 && config.ciReport.format === 'junit') {
-    promises.push(writeJunitReport(config, reporter));
+    promises.push(writeJunitReport(config, logger, reporter));
   }
 
   if (config.report && config.report.indexOf('json') > -1) {
-    promises.push(writeJsonReport(config, reporter));
+    promises.push(writeJsonReport(config, logger, reporter));
   }
 
-  promises.push(writeBrowserReport(config, reporter));
+  promises.push(writeBrowserReport(config, logger, reporter));
 
   return allSettled(promises);
 }
 
-function writeBrowserReport (config, reporter) {
+function writeBrowserReport (config, logger, reporter) {
   var testConfig;
   if (typeof config.args.config === 'object') {
     testConfig = config.args.config;
@@ -96,7 +94,7 @@ function writeBrowserReport (config, reporter) {
   });
 }
 
-function writeJunitReport (config, reporter) {
+function writeJunitReport (config, logger, reporter) {
   logger.log('Writing jUnit Report');
 
   var builder = require('junit-report-builder');
@@ -136,7 +134,7 @@ function writeJunitReport (config, reporter) {
   });
 }
 
-function writeJsonReport (config, reporter) {
+function writeJsonReport (config, logger, reporter) {
   var jsonReporter = cloneDeep(reporter);
   function toAbsolute (p) {
     return (path.isAbsolute(p)) ? p : path.join(config.projectPath, p);
@@ -170,13 +168,14 @@ function writeJsonReport (config, reporter) {
 
 module.exports = {
   execute: function (config) {
+    var logger = require('../util/logging/logger')(config, 'report');
     return compare(config).then(function (report) {
       var failed = report.failed();
       logger.log('Test completed...');
-      logger.log(chalk.green(report.passed() + ' Passed'));
-      logger.log(chalk[(failed ? 'red' : 'green')](+failed + ' Failed'));
+      logger.log(logger.green(report.passed() + ' Passed'));
+      logger.log(logger[(failed ? 'red' : 'green')](+failed + ' Failed'));
 
-      return writeReport(config, report).then(function (results) {
+      return writeReport(config, logger, report).then(function (results) {
         for (var i = 0; i < results.length; i++) {
           if (results[i].state !== 'fulfilled') {
             logger.error('Failed writing report with error: ' + results[i].value);
