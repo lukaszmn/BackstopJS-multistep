@@ -82,6 +82,6 @@ const exampleConfig = {
     asyncCompareLimit: 50,
     debug: false,
     debugWindow: false,
-    logger: "console"
+    logger: 'console'
   }
 };

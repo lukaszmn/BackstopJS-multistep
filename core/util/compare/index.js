@@ -77,13 +77,14 @@ function compareImages (referencePath, testPath, pair, resembleOutputSettings, T
       Test.status = data.status;
       pair.diff = data.diff;
 
+      var res;
       if (data.status === 'fail') {
         pair.diffImage = data.diffImage;
         var message = 'ERROR { requireSameDimensions: ' + (data.requireSameDimensions ? 'true' : 'false') + ', size: ' + (data.isSameDimensions ? 'ok' : 'isDifferent') + ', content: ' + data.diff.misMatchPercentage + '%, threshold: ' + pair.misMatchThreshold + '% }: ' + pair.label + ' ' + pair.fileName;
-        var res = Object.assign({}, loggerDebug, { result: false });
+        res = Object.assign({}, loggerDebug, { result: false });
         logger.error(message, res);
       } else {
-        var res = Object.assign({}, loggerDebug, { result: true });
+        res = Object.assign({}, loggerDebug, { result: true });
         logger.success('OK: ' + pair.label + ' ' + pair.fileName, res);
       }
 

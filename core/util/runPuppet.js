@@ -35,7 +35,7 @@ module.exports = function (args) {
   return processScenarioView(scenario, variantOrScenarioLabelSafe, scenarioLabelSafe, viewport, config);
 };
 
-function getLoggerDebug(scenario, viewport) {
+function getLoggerDebug (scenario, viewport) {
   return {
     scenario: scenario,
     viewport: viewport,
@@ -126,7 +126,7 @@ async function processScenarioView (scenario, variantOrScenarioLabelSafe, scenar
     if (isReference && scenario.referenceUrl) {
       url = scenario.referenceUrl;
     }
-    await page.goto(translateUrl(url, function(msg) { config._logger.log(msg, loggerDebug); }));
+    await page.goto(translateUrl(url, function (msg) { config._logger.log(msg, loggerDebug); }));
 
     await injectBackstopTools(page);
 

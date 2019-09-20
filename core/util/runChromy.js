@@ -32,7 +32,7 @@ module.exports = function (args) {
   return processScenarioView(scenario, variantOrScenarioLabelSafe, scenarioLabelSafe, viewport, config, runId, assignedPort);
 };
 
-function getLoggerDebug(scenario, viewport) {
+function getLoggerDebug (scenario, viewport) {
   return {
     scenario: scenario,
     viewport: viewport,
@@ -441,7 +441,6 @@ function delegateSelectors (chromy, scenario, viewport, variantOrScenarioLabelSa
     });
   }).then(_ => compareConfig);
 }
-
 
 // TODO: remove filepath_
 function captureScreenshot (chromy, filePath_, selector, selectorMap, config, selectors, loggerDebug) {

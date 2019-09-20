@@ -3,17 +3,18 @@ const chalk = require('chalk');
 const logger = require('../../../core/util/logging/loggerConsole');
 
 describe('logger console', function () {
-
-  function test(fn) {
+  function test (fn) {
     let log = '';
     const clog = console.log;
-    console.log = function(s) { log += s; };
+    console.log = function (s) { log += s; };
 
     try {
       fn();
+      return log;
+    } catch (err) {
+      return err;
     } finally {
       console.log = clog;
-      return log;
     }
   }
 
@@ -72,5 +73,4 @@ describe('logger console', function () {
     const log = test(fn);
     assert.strictEqual(log, chalk.white('Error: msg'));
   });
-
 });

@@ -51,7 +51,6 @@ var commands = commandNames
     return {
       name: command.name,
       execute: function execute (config) {
-
         var logger = require('../util/logging/logger')(config, 'COMMAND');
 
         config.perf[command.name] = { started: new Date() };
