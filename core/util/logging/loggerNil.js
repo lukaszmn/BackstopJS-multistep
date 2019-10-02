@@ -5,6 +5,8 @@ module.exports = function (subject) {
     log: function () {},
     info: function () {},
     debug: function () {},
-    success: function () {}
+    success: function () {},
+    init: function () {},
+    end: function () {}
   };
 };

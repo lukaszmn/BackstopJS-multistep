@@ -21,6 +21,8 @@ module.exports = function (subject) {
     log: function (string, context) { logger.log(getMessage(string, context)); },
     info: function (string, context) { logger.info(getMessage(string, context)); },
     debug: function (string, context) { logger.debug(getMessage(string, context)); },
-    success: function (string, context) { logger.success(getMessage(string, context)); }
+    success: function (string, context) { logger.success(getMessage(string, context)); },
+    init: function () {},
+    end: function () {}
   };
 };

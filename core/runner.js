@@ -3,7 +3,18 @@ var makeConfig = require('./util/makeConfig');
 
 module.exports = function (command, options) {
   var config = makeConfig(command, options);
-  return executeCommand(command, config);
+
+  var logger = require('./util/logging/logger')(config, 'RUNNER');
+  logger.init();
+
+  return executeCommand(command, config)
+    .catch(function (error) {
+      logger.end();
+      throw error;
+    })
+    .then(function () {
+      logger.end();
+    });
 };
 
 /* ***

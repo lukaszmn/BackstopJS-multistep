@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>{{title}}</title>
+  <style>
+    table { border-collapse: collapse; font-size: 12px; font-family: monospace; }
+    th, td { border: 1px dotted gray; }
+  </style>
+</head>
+<body>
+
+  <table>
+    <tr>
+      <th width="25%">Scenario</th>
+      <th width="1%">Viewport</th>
+      <th width="25%">Log</th>
+      <th width="25%">Browser</th>
+      <th width="25%">Comparer</th>
+    </tr>
+    <!--{{insert-template}}-->
+  </table>
+
+  <ul>
+    <!--{{misc}}-->
+  </ul>
+
+  <script>
+    setTimeout(() => location.reload(), 1000);
+  </script>
+</body>
+</html>
+
+<!--
+{{template-start}}
+  <tr>
+    <td>{{scenario}}</td>
+    <td>{{viewport}}</td>
+    <td>{{log}}</td>
+    <td>{{browser}}</td>
+    <td>{{comparer}}</td>
+  </tr>
+{{template-end}}
+-->
