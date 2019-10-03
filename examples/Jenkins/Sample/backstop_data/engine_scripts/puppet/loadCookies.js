@@ -1,6 +1,6 @@
 var fs = require('fs');
 
-module.exports = async (page, scenario) => {
+module.exports = async (page, scenario, vp) => {
   var cookies = [];
   var cookiePath = scenario.cookiePath;
 
@@ -25,5 +25,5 @@ module.exports = async (page, scenario) => {
     );
   }
   await setCookies();
-  scenario._logger.log('Cookie state restored with:' + JSON.stringify(cookies, null, 2), { scenario: scenario });
+  scenario._logger.log('Cookie state restored with:' + JSON.stringify(cookies, null, 2), { scenario: scenario, viewport: vp });
 };

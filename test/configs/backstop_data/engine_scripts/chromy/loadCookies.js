@@ -1,6 +1,6 @@
 var fs = require('fs');
 
-module.exports = function (chromy, scenario) {
+module.exports = function (chromy, scenario, vp) {
   var cookies = [];
   var cookiePath = scenario.cookiePath;
 

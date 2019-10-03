@@ -443,7 +443,7 @@ Inside `filename.js`, structure it like this:
 ```js
 // onBefore example (puppeteer engine)
 module.exports = async (page, scenario, vp) => {
-  await require('./loadCookies')(page, scenario);
+  await require('./loadCookies')(page, scenario, vp);
 
   // Example: set user agent
   await page.setUserAgent('some user agent string here');

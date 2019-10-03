@@ -1,6 +1,6 @@
 var fs = require('fs');
 
-module.exports = async (page, scenario) => {
+module.exports = async (page, scenario, vp) => {
   var cookies = [];
   var cookiePath = scenario.cookiePath;
 

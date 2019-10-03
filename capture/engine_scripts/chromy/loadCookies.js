@@ -1,6 +1,6 @@
-var fs = require('fs');
+  var fs = require('fs');
 
-module.exports = function (chromy, scenario) {
+module.exports = function (chromy, scenario, vp) {
   var cookies = [];
   var cookiePath = scenario.cookiePath;
 
@@ -18,5 +18,5 @@ module.exports = function (chromy, scenario) {
 
   // SET COOKIES VIA CHROMY
   chromy.setCookie(cookies);
-  scenario._logger.log('Cookie state restored with:' + JSON.stringify(cookies, null, 2), { scenario: scenario });
+  scenario._logger.log('Cookie state restored with:' + JSON.stringify(cookies, null, 2), { scenario: scenario, viewport: vp });
 };

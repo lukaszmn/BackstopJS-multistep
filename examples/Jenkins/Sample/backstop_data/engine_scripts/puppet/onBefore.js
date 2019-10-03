@@ -1,5 +1,5 @@
 module.exports = async (page, scenario, vp) => {
-  await require('./loadCookies')(page, scenario);
+  await require('./loadCookies')(page, scenario, vp);
 
   // Emulate iPhone
   if (vp.label == "iPhone6,6s,7,8") {
@@ -8,5 +8,5 @@ module.exports = async (page, scenario, vp) => {
 
   // Custom Timeout
   await page.setDefaultNavigationTimeout(300000);
-  
+
 };
